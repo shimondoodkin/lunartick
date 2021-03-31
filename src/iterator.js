@@ -164,7 +164,30 @@ class Iterator {
     // Daily/Hourly/Minutely/Secondly can all advance in a similar
     // predictable fashion and don't need to be handled separately.
     if (this.rule.frequency === 4 && this.rule.interval === 1) {
-      const day = this.rule.byDay[0];
+      
+      // next smallest day of today in the array or first smallest in array
+
+      //toy algorithm:
+      // d=[3,1,4]
+      // ((n)=>{
+      //   d.sort()
+      //   for(a of d)
+      //     if(a>n)
+      //       return a;
+      //   return d[0]
+      // })(4)     
+
+      this.rule.byDay.sort();
+      const currentDay=intervalTime.getDay();
+      let day=this.rule.byDay[0];
+      for(let a of this.rule.byDay)
+      {
+        if(a>currentDay)
+        {
+         day=a;
+         break;
+        }
+      }
 
       if (day !== intervalTime.getDay()) {
         intervalTime.setDay(day);

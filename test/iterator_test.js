@@ -49,6 +49,37 @@ describe('Iterator', () => {
     timer.restore();
   });
 
+  it('it should support multiple weekdays', () => {
+    const timer = sinon.useFakeTimers(Date.UTC(2017, 2, 26, 0));
+
+    const iterator = new Iterator({
+      frequency: 4,
+      interval: 1,
+      byDay: [0,1,2,3,4,5,6],
+      byHour: [10],
+      byMinute: [30],
+      count: 7,
+    });
+
+    const day = Array.from(iterator).map(x => x.toDate());
+    // console.log(day);
+
+    function addDay(d) {
+      let r=new Date(d);
+      r.setDate(r.getDate() + 1);
+      return r;
+    }
+
+    expect(day[1].getDate()).to.equal(addDay(day[0]).getDate());
+    expect(day[2].getDate()).to.equal(addDay(day[1]).getDate());
+    expect(day[3].getDate()).to.equal(addDay(day[2]).getDate());
+    expect(day[4].getDate()).to.equal(addDay(day[3]).getDate());
+    expect(day[5].getDate()).to.equal(addDay(day[4]).getDate());
+    expect(day[6].getDate()).to.equal(addDay(day[5]).getDate());
+
+    timer.restore();
+  });
+
   it('hours should change local time when given a DST timezone', () => {
     const timer = sinon.useFakeTimers(Date.UTC(2017, 2, 26, 0));
 

@@ -84,7 +84,8 @@ Array.from(iterator);
 
 ### Limitations
 
-- Currently does not support multiple values for byDay, byHour, byMinute and bySecond.
+- Currently does not support multiple values for byHour, byMinute and bySecond.
+- Only supports multiple values for byDay in interval = 1 and frequency = 4.
 
 ### Licensing
 
