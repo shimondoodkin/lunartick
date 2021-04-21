@@ -11,14 +11,15 @@ const moment = require('moment-timezone');
 class TimezoneDate {
   constructor(timestamp = new Date(), timezone = 'UTC') {
     if (timestamp instanceof TimezoneDate) {
-      timestamp = timestamp.date; // eslint-disable-line
+      this.date = timestamp.date.clone();
     }
-
-    if (!timezone || typeof timezone !== 'string') {
-      throw new Error('Invalid timezone provided');
+    else
+    {
+      if (!timezone || typeof timezone !== 'string') {
+        throw new Error('Invalid timezone provided');
+      }
+      this.date = moment.tz(timestamp, timezone);
     }
-
-    this.date = moment.tz(timestamp, timezone);
   }
 
   addYear() {
