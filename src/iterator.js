@@ -18,6 +18,8 @@ class Iterator {
       this.count = 52;
     }
 
+    this.first=true;
+
     const timezone = this.rule.tzId || 'UTC';
     this.start = new TimezoneDate(start || new Date(), timezone);
   }
@@ -36,15 +38,15 @@ class Iterator {
 
   setLowerIntervals(intervalTime, intervals) {
     if (this.rule.frequency > 0) {
-      const seconds = this.rule.bySecond ? this.rule.bySecond[0] : intervals.getSeconds();
+      const seconds = this.rule.bySecond||this.rule.bySecond===0 ? this.rule.bySecond[0] : intervals.getSeconds();
       intervalTime.setSeconds(seconds);
     }
     if (this.rule.frequency > 1) {
-      const minutes = this.rule.byMinute ? this.rule.byMinute[0] : intervals.getMinutes();
+      const minutes = this.rule.byMinute||this.rule.byMinute===0 ? this.rule.byMinute[0] : intervals.getMinutes();
       intervalTime.setMinutes(minutes);
     }
     if (this.rule.frequency > 2) {
-      const hours = this.rule.byHour ? this.rule.byHour[0] : intervals.getHours();
+      const hours = this.rule.byHour || this.rule.byHour ===0 ? this.rule.byHour[0] : intervals.getHours();
       intervalTime.setHours(hours);
     }
 
@@ -146,7 +148,86 @@ class Iterator {
     return this.setLowerIntervals(intervalTime, intervals);
   }
 
+  getCurrent(fromDate) {
+    const timezone = this.rule.tzId || 'UTC';
+    const tzFromDate = new TimezoneDate(fromDate, timezone);
+    const intervalTime = this.getLowerIntervals(tzFromDate);
+
+    // If this rule is monthly
+    if (this.rule.frequency === 5) {
+      throw new Error("not implemented")
+      return this.handleMonthly(intervalTime, tzFromDate);
+    }
+
+    // If this rule is fortnightly
+    if (this.rule.frequency === 4 && this.rule.interval === 2) {
+      throw new Error("not implemented")
+      return this.handleFortnight(intervalTime, tzFromDate);
+    }
+
+    // Daily/Hourly/Minutely/Secondly can all advance in a similar
+    // predictable fashion and don't need to be handled separately.
+    if (this.rule.frequency === 4 && this.rule.interval === 1) {
+      
+      // next smallest day of today in the array or first smallest in array
+
+      //toy algorithm:
+      // d=[3,1,4]
+      // ((n)=>{
+      //   d.sort()
+      //   for(a of d)
+      //     if(a>n)
+      //       return a;
+      //   return d[0]
+      // })(4)     
+
+      // the algorithm above is modified to check if current day is one of possible days 
+      // if not then there is no possible current day at start date
+      
+      this.rule.byDay.sort();
+      const currentDay=intervalTime.getDay();
+      let day=false;
+      for(let a of this.rule.byDay)
+      {
+        if(a==currentDay)
+        {
+         day=a;
+         break;
+        }
+      }
+      if(day===false)
+        return false;
+
+      if (
+          tzFromDate.isAfter(intervalTime)
+      ) {
+        false;
+      }
+      // return intervalTime;
+      // tzFromDate.isSameDate(intervalTime) 
+      
+      const intervals = this.getLowerIntervals(intervalTime);
+  
+      // for (let i = 0; i < this.rule.interval; i++) { // eslint-disable-line
+      //  intervalTime[constants.ADD_FREQUENCY[this.rule.frequency]]();
+      // }
+      let result =  this.setLowerIntervals(intervalTime, intervals);
+      return result;
+    }
+
+    throw new Error('not implemented');
+
+  }
+
   getNext(fromDate) {
+    if(this.first)
+    {
+      this.first=false;
+      const firstDate=this.getCurrent(fromDate);
+      if(firstDate)
+        return firstDate;
+    }
+    
     const timezone = this.rule.tzId || 'UTC';
     const tzFromDate = new TimezoneDate(fromDate, timezone);
     const intervalTime = this.getLowerIntervals(tzFromDate);

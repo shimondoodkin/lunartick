@@ -235,6 +235,26 @@ class TimezoneDate {
 
     return this.date.isSameOrAfter(d);
   }
+
+  isAfter(d) {
+    if (d instanceof TimezoneDate) {
+      return this.date.isAfter(d.date);
+    }
+    return this.date.isAfter(d);
+  }
+  
+  isSameDate(d) {
+    
+    if (d instanceof TimezoneDate) {
+      d=d.date;
+    }
+
+    return ( this.date.getFullYear()==d.getFullYear()
+          && this.date.getMonth()==d.getMonth()
+          && this.date.getDate()==d.getDate()
+    );
+  }
+
 }
 
 module.exports = TimezoneDate;
